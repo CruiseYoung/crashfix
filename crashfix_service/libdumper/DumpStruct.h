@@ -403,6 +403,7 @@ typedef struct DECLSPEC_ALIGN(16) _M128A_my {
 // Format of data for 32-bit fxsave/fxrstor instructions.
 //
 
+#ifndef _WIN64
 typedef struct _XMM_SAVE_AREA32 {
     WORD   ControlWord;
     WORD   StatusWord;
@@ -421,6 +422,7 @@ typedef struct _XMM_SAVE_AREA32 {
     M128A_my XmmRegisters[16];
     BYTE  Reserved4[96];
 } XMM_SAVE_AREA32, *PXMM_SAVE_AREA32;
+#endif
 
 #define LEGACY_SAVE_AREA_LENGTH sizeof(XMM_SAVE_AREA32)
 

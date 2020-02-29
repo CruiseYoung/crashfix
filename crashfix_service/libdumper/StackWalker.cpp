@@ -430,9 +430,9 @@ BOOL CStackWalker::UndoAMD64Prolog(CPeReader* pPeReader, DWORD dwUnwindInfoRVA, 
         case UWOP_ALLOC_LARGE: // Allocate a large-sized area on the stack.
             {
                 // There are two forms. If the operation info equals 0, then the size of the allocation
-                // divided by 8 is recorded in the next slot, allowing an allocation up to 512K – 8. If
+                // divided by 8 is recorded in the next slot, allowing an allocation up to 512K ?8. If
                 // the operation info equals 1, then the unscaled size of the allocation is recorded in
-                // the next two slots in little-endian format, allowing allocations up to 4GB – 8.
+                // the next two slots in little-endian format, allowing allocations up to 4GB ?8.
 
                 if(UnwindCode.OpInfo==0)
                 {
