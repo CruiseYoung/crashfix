@@ -286,7 +286,8 @@ BOOL CHttpRequestSender::WriteTextPart(HINTERNET hRequest, CString sName)
         return FALSE;
     }
     
-	std::string sHeaderA = strconv::w2a(sHeader.GetBuffer(0));
+	std::string sHeaderA = strconv::t2a(sHeader.GetBuffer(0));
+    sHeader.ReleaseBuffer();
     
     DWORD dwBytesWritten = 0;
 	bRet=InternetWriteFile(hRequest, sHeaderA.c_str(), (DWORD)sHeaderA.length(), &dwBytesWritten);
@@ -344,7 +345,8 @@ BOOL CHttpRequestSender::WriteTextPart(HINTERNET hRequest, CString sName)
         return FALSE;
     }
 
-	std::string sFooterA = strconv::w2a(sFooter.GetBuffer(0));
+	std::string sFooterA = strconv::t2a(sFooter.GetBuffer(0));
+    sFooter.ReleaseBuffer();
     
 	bRet=InternetWriteFile(hRequest, sFooterA.c_str(), (DWORD)sFooterA.length(), &dwBytesWritten);
     if(!bRet)
@@ -370,7 +372,8 @@ BOOL CHttpRequestSender::WriteAttachmentPart(HINTERNET hRequest, CString sName)
         return FALSE;
     }
     
-	std::string sHeaderA = strconv::w2a(sHeader.GetBuffer(0));
+	std::string sHeaderA = strconv::t2a(sHeader.GetBuffer(0));
+    sHeader.ReleaseBuffer();
 
     DWORD dwBytesWritten = 0;
 	bRet=InternetWriteFile(hRequest, sHeaderA.c_str(), (DWORD)sHeaderA.length(), &dwBytesWritten);
@@ -439,7 +442,8 @@ BOOL CHttpRequestSender::WriteAttachmentPart(HINTERNET hRequest, CString sName)
         return FALSE;
     }
 
-	std::string sFooterA = strconv::w2a(sFooter.GetBuffer(0));
+	std::string sFooterA = strconv::t2a(sFooter.GetBuffer(0));
+    sFooter.ReleaseBuffer();
     
 	bRet=InternetWriteFile(hRequest, sFooterA.c_str(), (DWORD)sFooterA.length(), &dwBytesWritten);
     if(!bRet)
@@ -461,7 +465,8 @@ BOOL CHttpRequestSender::WriteTrailingBoundary(HINTERNET hRequest)
     if(!bRet)
         return FALSE;
     
-	std::string sTextA = strconv::w2a(sText.GetBuffer(0));
+	std::string sTextA = strconv::t2a(sText.GetBuffer(0));
+    sText.ReleaseBuffer();
     
     DWORD dwBytesWritten = 0;
 	bRet=InternetWriteFile(hRequest, sTextA.c_str(), (DWORD)sTextA.length(), &dwBytesWritten);
@@ -501,9 +506,10 @@ BOOL CHttpRequestSender::FormatAttachmentPartHeader(CString sName, CString& sTex
 	std::wstring sBaseFileName;
 	std::wstring sDirectory;
 	std::wstring sExt;
-	SplitFileName(it->second.m_sSrcFileName.GetBuffer(0), sDirectory, sFileName, sBaseFileName, sExt);
+	SplitFileName(strconv::t2w(it->second.m_sSrcFileName.GetBuffer(0)), sDirectory, sFileName, sBaseFileName, sExt);
+    it->second.m_sSrcFileName.ReleaseBuffer();
 
-	sText.Format(m_sFilePartHeaderFmt, m_sBoundary, it->first, sFileName.c_str(), it->second.m_sContentType);
+	sText.Format(m_sFilePartHeaderFmt, m_sBoundary, it->first, strconv::w2t(sFileName).c_str(), it->second.m_sContentType);
     return TRUE;
 }
 

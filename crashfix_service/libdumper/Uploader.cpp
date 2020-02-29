@@ -54,14 +54,14 @@ void CUploader::LoadPersistentSettings()
 	TCHAR szBuffer[512] = _T("");
 
 	LPCTSTR szUploadURL = m_Profile.GetProfileString(SECTION_GENERAL, ENTRY_UPLOAD_URL, _T("http://127.0.0.1/crashfix/index.php/debugInfo/uploadExternal"), szBuffer, 512);
-	m_sUploadURL = strconv::w2a(szUploadURL);
+	m_sUploadURL = strconv::t2a(szUploadURL);
 
 	LPCTSTR szProjectName = m_Profile.GetProfileString(SECTION_GENERAL, ENTRY_PROJECT_NAME, _T("YourProjectName"), szBuffer, 512);
-	m_sProjectName = strconv::w2a(szProjectName);
+	m_sProjectName = strconv::t2a(szProjectName);
 
 	LPCTSTR szSearchPattern = m_Profile.GetProfileString(SECTION_GENERAL, ENTRY_SEARCH_PATTERN, NULL, szBuffer, 512);
 	if(szSearchPattern!=NULL)
-		AddSearchPattern(szSearchPattern);
+		AddSearchPattern(strconv::t2w(szSearchPattern));
 
 	bool bRecursiveSearch = 0!=m_Profile.GetProfileInt(SECTION_GENERAL, ENTRY_RECURSIVE_SEARCH, 0);
 	SetRecursiveSearch(bRecursiveSearch);
@@ -69,15 +69,15 @@ void CUploader::LoadPersistentSettings()
 
 void CUploader::SavePersistentSettings()
 {
-	m_Profile.WriteProfileString(SECTION_GENERAL, ENTRY_UPLOAD_URL, strconv::a2w(m_sUploadURL).c_str());
-	m_Profile.WriteProfileString(SECTION_GENERAL, ENTRY_PROJECT_NAME, strconv::a2w(m_sProjectName).c_str());
+	m_Profile.WriteProfileString(SECTION_GENERAL, ENTRY_UPLOAD_URL, strconv::a2t(m_sUploadURL).c_str());
+	m_Profile.WriteProfileString(SECTION_GENERAL, ENTRY_PROJECT_NAME, strconv::a2t(m_sProjectName).c_str());
 
 	if(m_asSearchPatterns.size()!=0)
 	{
 		std::wstring sSearchPattern;
 		GetSearchPatternByIndex(0, sSearchPattern);
 
-		m_Profile.WriteProfileString(SECTION_GENERAL, ENTRY_SEARCH_PATTERN, sSearchPattern.c_str());
+		m_Profile.WriteProfileString(SECTION_GENERAL, ENTRY_SEARCH_PATTERN, strconv::w2t(sSearchPattern).c_str());
 	}
 
 	m_Profile.WriteProfileInt(SECTION_GENERAL, ENTRY_RECURSIVE_SEARCH, m_bRecursiveSearch);
@@ -182,7 +182,7 @@ bool CUploader::SearchFiles(std::wstring sSearchPattern, int nLevel)
 	std::wstring sExtension;
 		
 	// If the pattern is a directory name, append *.pdb
-	DWORD dwAttr = GetFileAttributes(sSearchPattern.c_str());
+	DWORD dwAttr = GetFileAttributesW(sSearchPattern.c_str());
 	if(dwAttr!=0xFFFFFFFF && (dwAttr&FILE_ATTRIBUTE_DIRECTORY)!=0)
 	{
 		sSearchPattern += L"\\*.pdb";
@@ -215,7 +215,7 @@ bool CUploader::SearchFiles(std::wstring sSearchPattern, int nLevel)
 		fi.m_Status = FUS_PENDING;
 		
 		LARGE_INTEGER lFileSize;
-		HANDLE hFile = CreateFile(sFileName.c_str(), 
+		HANDLE hFile = CreateFileW(sFileName.c_str(), 
             GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL); 
         if(hFile!=INVALID_HANDLE_VALUE)
 		{

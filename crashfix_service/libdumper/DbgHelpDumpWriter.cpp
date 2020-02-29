@@ -23,7 +23,7 @@ BOOL CDbgHelpDumpWriter::SetDbgHelpPath(LPCWSTR szDbgHelpPath)
 }
 
 // This method creates minidump of the process
-BOOL CDbgHelpDumpWriter::Write(ULONG uProcessID, ULONG uThreadID, PEXCEPTION_POINTERS pExcPtrs, LPCWSTR szFileName)
+BOOL CDbgHelpDumpWriter::Write(ULONG uProcessID, ULONG uThreadID, PEXCEPTION_POINTERS pExcPtrs, LPCTSTR szFileName)
 {
     BOOL bStatus = FALSE;
     HMODULE hDbgHelp = NULL;

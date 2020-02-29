@@ -498,17 +498,17 @@ int CCommandProcessor::WriteDump(LPCSTR szOutFile)
 	DWORD dwProcessId = 0;
 	DWORD dwThreadId = 0;
 	EXCEPTION_POINTERS* pExcPtrs = NULL;
-	std::wstring sFileName = GetModulePath(NULL)+_T("\\crash.ini");
+	std::wstring sFileName = GetModulePath(NULL)+L"\\crash.ini";
 	const int BUFF_SIZE=1024;
 	TCHAR szBuff[BUFF_SIZE] = _T("");
 
-	GetPrivateProfileString(_T("Crash"), _T("ProcessId"), _T("0"), szBuff, BUFF_SIZE, sFileName.c_str());
+	GetPrivateProfileString(_T("Crash"), _T("ProcessId"), _T("0"), szBuff, BUFF_SIZE, strconv::w2t(sFileName).c_str());
 	_stscanf_s(szBuff, _T("%lu"), &dwProcessId );
 
-	GetPrivateProfileString(_T("Crash"), _T("ThreadId"), _T("0"), szBuff, BUFF_SIZE, sFileName.c_str());
+	GetPrivateProfileString(_T("Crash"), _T("ThreadId"), _T("0"), szBuff, BUFF_SIZE, strconv::w2t(sFileName).c_str());
 	_stscanf_s(szBuff, _T("%lu"), &dwThreadId );
 
-	GetPrivateProfileString(_T("Crash"), _T("ExcPtrs"), _T("0"), szBuff, BUFF_SIZE, sFileName.c_str());
+	GetPrivateProfileString(_T("Crash"), _T("ExcPtrs"), _T("0"), szBuff, BUFF_SIZE, strconv::w2t(sFileName).c_str());
 	_stscanf_s(szBuff, _T("%p"), &pExcPtrs );
 
 	IMiniDumpWriter* pDmpWriter = NULL;
@@ -530,24 +530,24 @@ int CCommandProcessor::WriteDumpDbgHelp(LPCSTR szOutFile)
 	DWORD dwProcessId = 0;
 	DWORD dwThreadId = 0;
 	EXCEPTION_POINTERS* pExcPtrs = NULL;
-	std::wstring sFileName = GetModulePath(NULL)+_T("\\crash.ini");
+	std::wstring sFileName = GetModulePath(NULL)+L"\\crash.ini";
 	const int BUFF_SIZE=1024;
 	TCHAR szBuff[BUFF_SIZE] = _T("");
 
-	GetPrivateProfileString(_T("Crash"), _T("ProcessId"), _T("0"), szBuff, BUFF_SIZE, sFileName.c_str());
+	GetPrivateProfileString(_T("Crash"), _T("ProcessId"), _T("0"), szBuff, BUFF_SIZE, strconv::w2t(sFileName).c_str());
 	_stscanf_s(szBuff, _T("%lu"), &dwProcessId );
 
-	GetPrivateProfileString(_T("Crash"), _T("ThreadId"), _T("0"), szBuff, BUFF_SIZE, sFileName.c_str());
+	GetPrivateProfileString(_T("Crash"), _T("ThreadId"), _T("0"), szBuff, BUFF_SIZE, strconv::w2t(sFileName).c_str());
 	_stscanf_s(szBuff, _T("%lu"), &dwThreadId );
 
-	GetPrivateProfileString(_T("Crash"), _T("ExcPtrs"), _T("0"), szBuff, BUFF_SIZE, sFileName.c_str());
+	GetPrivateProfileString(_T("Crash"), _T("ExcPtrs"), _T("0"), szBuff, BUFF_SIZE, strconv::w2t(sFileName).c_str());
 	_stscanf_s(szBuff, _T("%p"), &pExcPtrs );
 
 	_tprintf(_T("Writing minidump file '%s' using dbghelp MiniDumpWriteDump API...\n"), szOutFile);
 
 	CDbgHelpDumpWriter dmp;
 	std::wstring sOutFile = strconv::a2w(szOutFile);
-	BOOL bWrite = dmp.Write(dwProcessId, dwThreadId, pExcPtrs, sOutFile.c_str());
+	BOOL bWrite = dmp.Write(dwProcessId, dwThreadId, pExcPtrs, strconv::w2t(sOutFile).c_str());
 	if(bWrite)
 	{
 		_tprintf(_T("Finished writing minidump file... OK.\n"));
@@ -555,7 +555,7 @@ int CCommandProcessor::WriteDumpDbgHelp(LPCSTR szOutFile)
 	else
 	{
 		_tprintf(_T("Finished writing minidump file... Failed.\n"));
-		_tprintf(_T("Error message: %s\n"), dmp.GetErrorMsg());
+        wprintf(L"Error message: %s\n", dmp.GetErrorMsg().c_str());
 	}
 
     m_sErrorMsg = "Success";

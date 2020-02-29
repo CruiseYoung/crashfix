@@ -172,7 +172,7 @@ std::wstring strconv::n2w(const wchar_t* fmt, ...)
 	va_list args;
 	va_start(args,fmt);
 #ifdef _WIN32
-	wvsprintf(buf, fmt, args);
+	wvsprintfW(buf, fmt, args);
 #else
 	vswprintf(buf, 63, fmt, args);
 #endif
@@ -196,7 +196,7 @@ std::wstring strconv::formatW(int nMaxChar, const wchar_t* fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 #ifdef _WIN32
-	wvnsprintf(buf, nMaxChar, fmt, args);
+	wvnsprintfW(buf, nMaxChar, fmt, args);
 #else
 	vswprintf(buf, nMaxChar, fmt, args);
 #endif

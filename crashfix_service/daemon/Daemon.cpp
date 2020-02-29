@@ -47,7 +47,7 @@ CDaemon::CDaemon()
 	m_bRestartedAfterCrash = false;
 	//m_bCriticalError = false;
 #ifdef _WIN32
-	m_hEventStop = CreateEvent(NULL, TRUE, FALSE, L"Local\\04B8BCA1-BDAF-4686-82CE-A7DF707C5287");
+	m_hEventStop = CreateEventW(NULL, TRUE, FALSE, L"Local\\04B8BCA1-BDAF-4686-82CE-A7DF707C5287");
 	m_bLogInitialized = false;
 #endif
 }
@@ -797,7 +797,7 @@ int CDaemon::Stop()
 #ifdef _WIN32
 
 	// Delete pidfile
-	DeleteFile(strconv::a2w(m_sPIDFile).c_str());
+	DeleteFileW(strconv::a2w(m_sPIDFile).c_str());
 
 	return StartNTService(FALSE);
 
@@ -1447,7 +1447,7 @@ int CDaemon::InstallNTService()
 
 	// Determine path to executable file
 	WCHAR szModulePath[_MAX_PATH]=L"";
-	GetModuleFileName(NULL, szModulePath, _MAX_PATH);
+	GetModuleFileNameW(NULL, szModulePath, _MAX_PATH);
 
 	std::wstring sCmdLine = L"\"";
 	sCmdLine += szModulePath;
@@ -1455,7 +1455,7 @@ int CDaemon::InstallNTService()
 	sCmdLine += L" --run-as-service";
 
 	// Install the service into SCM by calling CreateService
-	SC_HANDLE hService = CreateService(
+	SC_HANDLE hService = CreateServiceW(
         hSCManager,                     // SCManager database
         SERVICE_NAME,                   // Name of service
         SERVICE_DISPLAY_NAME,           // Name to display
@@ -1481,10 +1481,10 @@ int CDaemon::InstallNTService()
 	CloseServiceHandle(hService);
 
 	// Set service description
-	hService = OpenService(hSCManager, SERVICE_NAME, SERVICE_CHANGE_CONFIG);
+	hService = OpenServiceW(hSCManager, SERVICE_NAME, SERVICE_CHANGE_CONFIG);
 	if(hService)
 	{
-		SERVICE_DESCRIPTION sd;
+		SERVICE_DESCRIPTIONW sd;
 		sd.lpDescription = SERVICE_DESC;
 		if(!ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd))
 		{
@@ -1522,7 +1522,7 @@ int CDaemon::RemoveNTService()
 	}
 
 	// Open existing service
-	SC_HANDLE hService = OpenService(hSCManager, SERVICE_NAME, SERVICE_STOP |
+	SC_HANDLE hService = OpenServiceW(hSCManager, SERVICE_NAME, SERVICE_STOP |
         SERVICE_QUERY_STATUS | DELETE);
 	if(!hService)
 	{
@@ -1586,7 +1586,7 @@ int CDaemon::StartNTService(BOOL bStart)
 	}
 
 	// Open existing service
-	SC_HANDLE hService = OpenService(hSCManager, SERVICE_NAME, SERVICE_START|SERVICE_STOP|SERVICE_INTERROGATE);
+	SC_HANDLE hService = OpenServiceW(hSCManager, SERVICE_NAME, SERVICE_START|SERVICE_STOP|SERVICE_INTERROGATE);
 	if(!hService)
 	{
 		// Print error message
@@ -1672,7 +1672,7 @@ int CDaemon::StartNTService(BOOL bStart)
 
 void CDaemon::EnterServiceMain()
 {
-	SERVICE_TABLE_ENTRY serviceTable[] =
+	SERVICE_TABLE_ENTRYW serviceTable[] =
     {
         { SERVICE_NAME, ServiceMain },
         { NULL, NULL }
@@ -1682,7 +1682,7 @@ void CDaemon::EnterServiceMain()
     // manager, which causes the thread to be the service control dispatcher
     // thread for the calling process. This call returns when the service has
     // stopped. The process should simply terminate when the call returns.
-    StartServiceCtrlDispatcher(serviceTable);
+    StartServiceCtrlDispatcherW(serviceTable);
 }
 
 void WINAPI CDaemon::ServiceMain(DWORD dwArgc, PWSTR *pszArgv)
@@ -1698,7 +1698,7 @@ void WINAPI CDaemon::ServiceMain(DWORD dwArgc, PWSTR *pszArgv)
 	m_ServiceStatus.dwCheckPoint     = 0;
 	m_ServiceStatus.dwWaitHint      = 0;
 
-	m_ServiceStatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME,
+	m_ServiceStatusHandle = RegisterServiceCtrlHandlerW(SERVICE_NAME,
 		(LPHANDLER_FUNCTION)ServiceControlHandler);
 	if (m_ServiceStatusHandle == (SERVICE_STATUS_HANDLE)0)
 	{
@@ -1709,7 +1709,7 @@ void WINAPI CDaemon::ServiceMain(DWORD dwArgc, PWSTR *pszArgv)
 	// Set current folder
 	std::wstring sDirName = GetModulePath(NULL);
 	sDirName = GetParentDir(sDirName);
-	SetCurrentDirectory(sDirName.c_str());
+	SetCurrentDirectoryW(sDirName.c_str());
 
 	CDaemon* pDaemon = CDaemon::GetInstance();
 

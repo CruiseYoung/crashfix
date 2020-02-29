@@ -40,6 +40,73 @@ namespace strconv
 
 	//! Formats a string
 	std::wstring formatW(int nMaxChar, const wchar_t* szFormat, ...);
+
+
+    #ifdef UNICODE
+    #define tstring std::wstring
+    #else
+    #define tstring std::string
+    #endif
+
+    #ifdef UNICODE
+    #define tformat formatW
+    #else
+    #define tformat format
+    #endif
+
+    #ifdef UNICODE
+    #define n2t n2w
+    #else
+    #define n2t n2a
+    #endif
+
+    #ifdef UNICODE
+    #define utf82t utf82w
+    #else
+    #define utf82t utf82a
+    #endif
+
+    #ifdef UNICODE
+    #define t2utf8 w2utf8
+    #else
+    #define t2utf8 a2utf8
+    #endif
+
+    inline std::string t2a(tstring str)
+    {
+    #ifdef UNICODE
+        return w2a(str);
+    #else
+        return str;
+    #endif
+    }
+
+    inline std::wstring t2w(tstring str)
+    {
+    #ifdef UNICODE
+        return str;
+    #else
+        return a2w(str);
+    #endif
+    }
+
+    inline tstring a2t(std::string str)
+    {
+    #ifdef UNICODE
+        return a2w(str);
+    #else
+        return str;
+    #endif
+    }
+
+    inline tstring w2t(std::wstring str)
+    {
+    #ifdef UNICODE
+        return str;
+    #else
+        return w2a(str);
+    #endif
+    }
 };
 
 #endif  //_STRCONV_H

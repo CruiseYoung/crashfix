@@ -42,7 +42,7 @@ bool CCrashDescReader::Init(std::wstring sFileName)
     
     // Check that the file exists
 #ifdef _WIN32
-    _tfopen_s(&f, sFileName.c_str(), L"rb");
+    _wfopen_s(&f, sFileName.c_str(), L"rb");
 #else
     std::string sUtf8FileName = strconv::w2a(sFileName);
     f = fopen(sUtf8FileName.c_str(), "rb");

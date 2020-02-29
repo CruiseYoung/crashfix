@@ -108,15 +108,15 @@ int RmDir(std::wstring sPath, bool bFailIfNonEmpty)
 #ifdef _WIN32
 	if(bFailIfNonEmpty)
 	{
-		BOOL bRemove = RemoveDirectory(sPath.c_str());
+		BOOL bRemove = RemoveDirectoryW(sPath.c_str());
 		return bRemove?0:1;
 	}
 	else	
 	{
-		SHFILEOPSTRUCT fop;
+		SHFILEOPSTRUCTW fop;
 		memset(&fop, 0, sizeof(SHFILEOPSTRUCT));
 
-		TCHAR szFrom[_MAX_PATH];
+		WCHAR szFrom[_MAX_PATH];
 		memset(szFrom, 0, sizeof(TCHAR)*(_MAX_PATH));
 		wcscpy_s(szFrom, _MAX_PATH, sPath.c_str());
 		szFrom[sPath.length()+1] = 0;
@@ -129,7 +129,7 @@ int RmDir(std::wstring sPath, bool bFailIfNonEmpty)
 		fop.pTo = NULL;                          // MUST be NULL
 		fop.fFlags &= ~FOF_ALLOWUNDO;   // ..don't use Recycle Bin
 
-		return SHFileOperation(&fop); // do it!
+		return SHFileOperationW(&fop); // do it!
 	}
 #else
 	// TODO
@@ -377,7 +377,7 @@ std::wstring GetModulePath(HMODULE hModule)
 {
 	wchar_t szBuf[_MAX_PATH]=L"";
 	GetModuleFileNameW(hModule, szBuf, _MAX_PATH);
-	TCHAR* ptr = _tcsrchr(szBuf,'\\');
+	WCHAR* ptr = wcsrchr(szBuf,L'\\');
 	if(ptr!=NULL)
 		*(ptr)=0; // remove executable name
 	return std::wstring(szBuf);

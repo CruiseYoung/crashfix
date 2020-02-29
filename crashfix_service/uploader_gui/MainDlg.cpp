@@ -78,10 +78,10 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_listLog.InsertColumn(0, _T("Message"), LVCFMT_LEFT, 1000);
 
 	CString sMsg;		
-	sMsg += "[";
+	sMsg += _T("[");
 	sMsg += GetTimeStamp();
-	sMsg += "] ";
-	sMsg += "Press the Upload Now button to start file upload.";
+	sMsg += _T("] ");
+	sMsg += _T("Press the Upload Now button to start file upload.");
 	m_listLog.InsertItem(0, sMsg);
 
 	// Init progress bar
@@ -146,7 +146,8 @@ LRESULT CMainDlg::OnBrowseClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
 		CString sFolderName = dlg.m_szFolderPath;		
 		CUploader* pUploader = CUploader::GetInstance();
 		pUploader->DeleteAllSearchPatterns();
-		pUploader->AddSearchPattern(sFolderName.GetBuffer());
+		pUploader->AddSearchPattern(strconv::t2w(sFolderName.GetBuffer()));
+        sFolderName.ReleaseBuffer();
 	}
 	
 	FillFileList();
@@ -177,11 +178,11 @@ LRESULT CMainDlg::OnUploadClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
 	TCHAR szBuffer[512] = _T("");
 
 	m_editURL.GetWindowText(szBuffer, 512);
-	std::string sURL = strconv::w2a(szBuffer);
+	std::string sURL = strconv::t2a(szBuffer);
 	CUploader::GetInstance()->SetUploadURL(sURL);
 
 	m_editProjectName.GetWindowText(szBuffer, 512);
-	std::string sProjectName = strconv::w2a(szBuffer);
+	std::string sProjectName = strconv::t2a(szBuffer);
 	CUploader::GetInstance()->SetProjectName(sProjectName);
 
 	if(!pUploader->IsUploadingNow())
@@ -190,10 +191,10 @@ LRESULT CMainDlg::OnUploadClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
 		FillFileList(FALSE);
 
 		CString sMsg;		
-		sMsg += "[";
+		sMsg += _T("[");
 		sMsg += GetTimeStamp();
-		sMsg += "] ";
-		sMsg += "Upload has been started.";
+		sMsg += _T("] ");
+		sMsg += _T("Upload has been started.");
 		m_listLog.InsertItem(m_listLog.GetItemCount(), sMsg);
 
 		// We want to receive notifications
@@ -233,9 +234,9 @@ LRESULT CMainDlg::OnTimer(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, B
 		m_statCurAction.SetWindowText(msg_log[i]);	
 
 		CString sMsg;		
-		sMsg += "[";
+		sMsg += _T("[");
 		sMsg += GetTimeStamp();
-		sMsg += "] ";
+		sMsg += _T("] ");
 		sMsg += msg_log[i];
 		int nItem = m_listLog.InsertItem(m_listLog.GetItemCount(), sMsg);
 		m_listLog.EnsureVisible(nItem, TRUE);
@@ -260,18 +261,18 @@ LRESULT CMainDlg::OnItemStatusChanged(UINT /*uMsg*/, WPARAM wParam, LPARAM lPara
 			continue;
 		
 		std::string sStatus = pUploader->FileStatusToStr(NewStatus);
-		m_listView.SetItemText(i, 1, strconv::a2w(sStatus).c_str());	
+		m_listView.SetItemText(i, 1, strconv::a2t(sStatus).c_str());	
 	}
 
 	if(NewStatus==FUS_CHECKING)
 	{
 		FileItem* pFileItem = pUploader->GetFileItem(nFileItem);		
 		CString sMsg;		
-		sMsg += "[";
+		sMsg += _T("[");
 		sMsg += GetTimeStamp();
-		sMsg += "] ";
-		sMsg += "Starting upload of file: ";
-		sMsg += pFileItem->m_sFileName.c_str();	
+		sMsg += _T("] ");
+		sMsg += _T("Starting upload of file: ");
+		sMsg += strconv::w2t(pFileItem->m_sFileName).c_str();
 		m_listLog.InsertItem(m_listLog.GetItemCount(), sMsg);
 	}
 
@@ -286,7 +287,7 @@ LRESULT CMainDlg::OnUploadComplete(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lP
 	// Hide progress controls
 	m_statCurActionTitle.EnableWindow(FALSE);
 	m_statCurAction.EnableWindow(FALSE);
-	m_statCurAction.SetWindowText(L"");
+	m_statCurAction.SetWindowText(_T(""));
 	m_pgsProgress.EnableWindow(FALSE);
 
 	// Reset progress bar
@@ -297,10 +298,10 @@ LRESULT CMainDlg::OnUploadComplete(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lP
 	m_btnUpload.EnableWindow(TRUE);
 
 	CString sMsg;		
-	sMsg += "[";
+	sMsg += _T("[");
 	sMsg += GetTimeStamp();
-	sMsg += "] ";
-	sMsg += "Upload has been finished.";
+	sMsg += _T("] ");
+	sMsg += _T("Upload has been finished.");
 	int nItem = m_listLog.InsertItem(m_listLog.GetItemCount(), sMsg);
 	m_listLog.EnsureVisible(nItem, TRUE);
 	
@@ -314,7 +315,7 @@ LRESULT CMainDlg::OnPathKillFocus(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 	
 	CUploader* pUploader = CUploader::GetInstance();
 	pUploader->DeleteAllSearchPatterns();
-	pUploader->AddSearchPattern(szBuffer);
+	pUploader->AddSearchPattern(strconv::t2w(szBuffer));
 
 	UpdateUI();
 	return 0;
@@ -325,7 +326,7 @@ LRESULT CMainDlg::OnUrlKillFocus(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWnd
 	TCHAR szBuffer[512] = _T("");
 	m_editURL.GetWindowText(szBuffer, 512);
 
-	std::string sURL = strconv::w2a(szBuffer);
+	std::string sURL = strconv::t2a(szBuffer);
 	CUploader::GetInstance()->SetUploadURL(sURL);
 
 	UpdateUI();
@@ -516,12 +517,12 @@ void CMainDlg::FillFileList(BOOL bSearch)
 		if(pfi==NULL)
 			continue;
 
-		int nItem = m_listView.InsertItem(0, pfi->m_sFileName.c_str());
+		int nItem = m_listView.InsertItem(0, strconv::w2t(pfi->m_sFileName).c_str());
 		m_listView.SetItemData(nItem, i);
 
 		CUploader* pUploader = CUploader::GetInstance();
 		std::string sStatus = pUploader->FileStatusToStr(pfi->m_Status);
-		m_listView.SetItemText(nItem, 1, strconv::a2w(sStatus).c_str());		
+		m_listView.SetItemText(nItem, 1, strconv::a2t(sStatus).c_str());		
 
 		CString sFileSize = FileSizeToStr(pfi->m_uFileSize);
 		m_listView.SetItemText(nItem, 2, sFileSize);
@@ -540,7 +541,7 @@ void CMainDlg::UpdateUI()
 	// Update Path edit box
 	std::wstring sSearchPattern;
 	if(pUploader->GetSearchPatternByIndex(0, sSearchPattern))
-		m_editPath.SetWindowText(sSearchPattern.c_str());
+		m_editPath.SetWindowText(strconv::w2t(sSearchPattern).c_str());
 
 	// Update Recursive Search check box state
 	bool bRecursiveSearch = pUploader->IsSearchRecursive();
@@ -548,11 +549,11 @@ void CMainDlg::UpdateUI()
 
 	// Update Upload URL edit box
 	std::string sURL = pUploader->GetUploadURL();
-	m_editURL.SetWindowText(CStringW(sURL.c_str()));
+	m_editURL.SetWindowText(strconv::a2t(sURL).c_str());
 
 	// Update Project Name edit box
 	std::string sProjectName = pUploader->GetProjectName();
-	m_editProjectName.SetWindowText(CStringW(sProjectName.c_str()));
+	m_editProjectName.SetWindowText(strconv::a2t(sProjectName).c_str());
 }
 
 CString CMainDlg::GetTimeStamp()

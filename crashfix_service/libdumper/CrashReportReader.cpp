@@ -307,7 +307,7 @@ int CCrashReportReader::UnzipFile(unzFile hZip, const char* szFileName, const wc
         goto cleanup;
 
 #if _MSC_VER>=1400
-    _tfopen_s(&f, szOutFileName, _T("wb"));
+    _wfopen_s(&f, szOutFileName, L"wb");
 #else
     f = fopen(sUtf8OutFileName.c_str(), "wb");
 #endif
@@ -362,11 +362,11 @@ BOOL CCrashReportReader::ExtractFile(LPCWSTR lpszFileName, LPCWSTR lpszFileSaveA
     {
 #ifdef _WIN32
         // Check if such file already exists
-        DWORD dwFileAttrs = GetFileAttributes(lpszFileSaveAs);
+        DWORD dwFileAttrs = GetFileAttributesW(lpszFileSaveAs);
         if(dwFileAttrs!=INVALID_FILE_ATTRIBUTES && // such object exists
             dwFileAttrs!=FILE_ATTRIBUTE_DIRECTORY)  // and it is not a directory
         {
-            SetErrorMsg(_T("Such file already exists."));
+            SetErrorMsg(L"Such file already exists.");
             return FALSE;
         }
 #else
@@ -411,8 +411,8 @@ std::wstring CCrashReportReader::GetTempFileName()
     wchar_t szTempDir[MAX_PATH - 14]   = L"";
     wchar_t szTempFile[MAX_PATH]       = L"";
 
-    if (GetTempPath(MAX_PATH - 14, szTempDir))
-        ::GetTempFileName(szTempDir, L"dumper", 0, szTempFile);
+    if (GetTempPathW(MAX_PATH - 14, szTempDir))
+        ::GetTempFileNameW(szTempDir, L"dumper", 0, szTempFile);
 
     return szTempFile;
 #else
